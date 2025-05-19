@@ -12,27 +12,6 @@ from vertexai.preview import reasoning_engines
 
 app = Flask(__name__)
 
-# --- GCP Project ID Retrieval (same as before) ---
-def get_gcp_project_id():
-    """Gets the GCP project ID from metadata server or environment variable."""
-    try:
-        metadata_server_url = "http://metadata.google.internal/computeMetadata/v1/project/project-id"
-        headers = {"Metadata-Flavor": "Google"}
-        response = requests.get(metadata_server_url, headers=headers, timeout=2)
-        response.raise_for_status()
-        return response.text, None
-    except requests.exceptions.RequestException:
-        project_id_env = os.environ.get('GOOGLE_CLOUD_PROJECT')
-        if project_id_env:
-            return project_id_env, None
-        else:
-            error_message = (
-                "Metadata server unavailable and GOOGLE_CLOUD_PROJECT environment variable not set."
-            )
-            return None, error_message
-    except Exception as e:
-        return None, f"Unexpected error fetching project ID: {e}"
-
 
 # --- Vertex AI Reasoning Engine Listing ---
 def get_reasoning_engines_details(project_id: str, location_id: str):
