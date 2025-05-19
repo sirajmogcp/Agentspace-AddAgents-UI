@@ -310,7 +310,7 @@
             const appId = getParameterValue('listAppId');
             
             try {
-                const response = await fetch(`/api/test-as/list-agents?project_id=${projectId}&app_id=${appId}`);
+                const response = await fetch(`/api/as-agents/list-agents?project_id=${projectId}&app_id=${appId}`);
                 const data = await response.json();
                 showResponse('listResponse', 'listResponseContent', data);
             } catch (error) {
@@ -333,7 +333,7 @@
             };
             
             try {
-                const response = await fetch('/api/test-as/create-agent', {
+                const response = await fetch('/api/as-agents/create-agent', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -353,7 +353,7 @@
             const agentId = document.getElementById('getAgentId').value;
             
             try {
-                const response = await fetch(`/api/test-as/get-agent?project_id=${projectId}&app_id=${appId}&agent_id=${agentId}`);
+                const response = await fetch(`/api/as-agents/get-agent?project_id=${projectId}&app_id=${appId}&agent_id=${agentId}`);
                 const data = await response.json();
                 showResponse('getResponse', 'getResponseContent', data);
             } catch (error) {
@@ -369,7 +369,7 @@
             const displayName = document.getElementById('getByNameDisplayName').value;
             
             try {
-                const response = await fetch(`/api/test-as/get-agent-by-name?project_id=${projectId}&app_id=${appId}&display_name=${displayName}`);
+                const response = await fetch(`/api/as-agents/get-agent-by-name?project_id=${projectId}&app_id=${appId}&display_name=${displayName}`);
                 const data = await response.json();
                 showResponse('getByNameResponse', 'getByNameResponseContent', data);
             } catch (error) {
@@ -391,7 +391,7 @@
             };
             
             try {
-                const response = await fetch('/api/test-as/update-agent', {
+                const response = await fetch('/api/as-agents/update-agent', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -415,7 +415,7 @@
             }
             
             try {
-                const response = await fetch(`/api/test-as/delete-agent?project_id=${projectId}&app_id=${appId}&agent_id=${agentId}`, {
+                const response = await fetch(`/api/as-agents/delete-agent?project_id=${projectId}&app_id=${appId}&agent_id=${agentId}`, {
                     method: 'DELETE'
                 });
                 const data = await response.json();

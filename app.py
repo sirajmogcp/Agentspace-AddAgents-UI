@@ -40,7 +40,7 @@ def get_reasoning_engines_details(project_id: str, location_id: str):
     if not project_id:
         return None, "Project ID is required to list Reasoning Engines."
     if not location_id:
-        location_id = os.environ.get('REASONING_ENGINE_LOCATION', 'global')
+        location_id = os.environ.get('REASONING_ENGINE_LOCATION', 'us-central1')
         #return None, "Location ID is required to list Reasoning Engines (e.g., 'us-central1')."
 
     try:
@@ -135,8 +135,6 @@ def list_discovery_engines(project_id: str, location_id: str, collection_id: str
         return None, f"API error listing Discovery Engines: {e}"
     except Exception as e:
         return None, f"An unexpected error occurred while listing Discovery Engines: {e}"
-
-next_agent_id = 1  # Changed from next_category_id
 
 # --- Helper Functions ---
 def find_agentspace_app(app_db_id):
@@ -256,8 +254,8 @@ def index():
 def test_as_page():
     return render_template('test_as.html')
 
-@app.route('/api/test-as/list-agents')
-def test_as_list_agents():
+@app.route('/api/as-agents/list-agents')
+def as_agents_list_agents():
     project_id = request.args.get('project_id')
     app_id = request.args.get('app_id')
     
@@ -267,8 +265,8 @@ def test_as_list_agents():
     result = list_agents(project_id, app_id)
     return jsonify(result)
 
-@app.route('/api/test-as/create-agent', methods=['POST'])
-def test_as_create_agent():
+@app.route('/api/as-agents/create-agent', methods=['POST'])
+def as_agents_create_agent():
     data = request.json
     required_fields = ['project_id', 'app_id', 'display_name', 'description', 'tool_description', 'adk_deployment_id']
     
@@ -288,8 +286,8 @@ def test_as_create_agent():
     )
     return jsonify(result)
 
-@app.route('/api/test-as/get-agent')
-def test_as_get_agent():
+@app.route('/api/as-agents/get-agent')
+def as_agents_get_agent():
     project_id = request.args.get('project_id')
     app_id = request.args.get('app_id')
     agent_id = request.args.get('agent_id')
@@ -300,8 +298,8 @@ def test_as_get_agent():
     result = get_agent(project_id, app_id, agent_id)
     return jsonify(result)
 
-@app.route('/api/test-as/update-agent', methods=['PUT'])
-def test_as_update_agent():
+@app.route('/api/as-agents/update-agent', methods=['PUT'])
+def as_agents_update_agent():
     data = request.json
     required_fields = ['project_id', 'app_id', 'agent_id']
     
@@ -322,8 +320,8 @@ def test_as_update_agent():
     )
     return jsonify(result)
 
-@app.route('/api/test-as/delete-agent', methods=['DELETE'])
-def test_as_delete_agent():
+@app.route('/api/as-agents/delete-agent', methods=['DELETE'])
+def as_agents_delete_agent():
     project_id = request.args.get('project_id')
     app_id = request.args.get('app_id')
     agent_id = request.args.get('agent_id')
@@ -334,8 +332,8 @@ def test_as_delete_agent():
     result = delete_agent(project_id, app_id, agent_id)
     return jsonify(result)
 
-@app.route('/api/test-as/get-agent-by-name')
-def test_as_get_agent_by_name():
+@app.route('/api/as-agents/get-agent-by-name')
+def as_agents_get_agent_by_name():
     project_id = request.args.get('project_id')
     app_id = request.args.get('app_id')
     display_name = request.args.get('display_name')
@@ -346,8 +344,8 @@ def test_as_get_agent_by_name():
     result = get_agent_by_display_name(project_id, app_id, display_name)
     return jsonify(result)
 
-@app.route('/api/test-as/list-reasoning-engines')
-def test_as_list_reasoning_engines():
+@app.route('/api/as-agents/list-reasoning-engines')
+def as_agents_list_reasoning_engines():
     project_id = request.args.get('project_id')
     location_id = request.args.get('location_id')
     
