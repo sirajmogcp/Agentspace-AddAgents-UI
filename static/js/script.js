@@ -44,8 +44,7 @@ function displayApps(apps) {
                     <h5 class="card-title">${app.appName}</h5>
                     <p class="card-text">ID: ${app.appId}</p>
                     <p class="card-text"><strong>Project ID:</strong> ${app.project_id}</p>
-                    <p class="card-text">Type: ${app.appType}</p>
-                    <p class="card-text">${app.details}</p>
+            
                     <button class="btn btn-primary me-2" onclick="showAddAgentModal(${app.id}, '${app.project_id}', '${app.appId}')">
                         Add Agent
                     </button>
