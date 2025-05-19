@@ -1,4 +1,4 @@
-import subprocess
+import requests
 import json
 import logging
 from google.auth import default
@@ -72,32 +72,20 @@ def create_agent(project_id, app_id, display_name, description, tool_description
     if icon_uri:
         data["icon"] = {"uri": icon_uri}
 
-    # Prepare the curl command
-    command = [
-        "curl", "-X", "POST",
-        "-H", f"Authorization: Bearer {access_token}",
-        "-H", "Content-Type: application/json",
-        "-H", f"X-Goog-User-Project: {project_id}",
-        url,
-        "-d", json.dumps(data)
-    ]
+    # Make the HTTP request
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+        "X-Goog-User-Project": project_id
+    }
 
-    logging.info(f"Create Agent Command: {command}")
-
-    # Execute the command
-    result = subprocess.run(command, capture_output=True, text=True)
-
-    if result.returncode == 0:
-        try:
-            agent_data = json.loads(result.stdout)
-            logging.debug(f"Create Agent Response: {agent_data}")
-            return {"status_code": result.returncode, "stdout": result.stdout, "stderr": result.stderr, "agent": agent_data}
-        except json.JSONDecodeError:
-            return {"status_code": result.returncode, "stdout": result.stdout, "stderr": result.stderr, "error": "Could not decode JSON response."}
-    else:
-        logging.error(f"Create Agent Error: {result.returncode}, {result.stderr}")
-
-    return {"status_code": result.returncode, "stdout": result.stdout, "stderr": result.stderr}
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        return {"status_code": response.status_code, "data": response.json()}
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Create Agent Error: {str(e)}")
+        return {"error": f"Request failed: {str(e)}", "status_code": response.status_code if 'response' in locals() else None}
 
 def list_agents(project_id, app_id):
     """
@@ -120,33 +108,21 @@ def list_agents(project_id, app_id):
     # Construct the URL
     url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/collections/default_collection/engines/{app_id}/assistants/default_assistant/agents"
 
-    # Prepare the curl command
-    command = [
-        "curl", "-X", "GET",
-        "-H", f"Authorization: Bearer {access_token}",
-        "-H", "Content-Type: application/json",
-        "-H", f"X-Goog-User-Project: {project_id}",
-        url
-    ]
+    # Make the HTTP request
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+        "X-Goog-User-Project": project_id
+    }
 
-    logging.debug(f"List Agents Command: {command}")
-    # Execute the command
-    result = subprocess.run(command, capture_output=True, text=True)
-
-    _check_required_params(locals(), ["project_id", "app_id"])
-    # Return the output as a list of agents
-    if result.returncode == 0:
-        try:
-            agents_data = json.loads(result.stdout)
-            logging.debug(f"List Agents Response: {agents_data}")
-            if "agents" in agents_data:
-                return {"agents": agents_data["agents"]}
-            else:
-                return {"agents": []}
-        except json.JSONDecodeError:
-            return {"error": "Could not decode JSON response.", "stderr": result.stderr}
-    else:
-        return {"error": "Error during agent listing", "stderr": result.stderr}
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        return {"agents": data.get("agents", [])}
+    except requests.exceptions.RequestException as e:
+        logging.error(f"List Agents Error: {str(e)}")
+        return {"error": f"Request failed: {str(e)}", "status_code": response.status_code if 'response' in locals() else None}
 
 def get_agent(project_id, app_id, agent_id):
     """
@@ -170,29 +146,20 @@ def get_agent(project_id, app_id, agent_id):
     # Construct the URL
     url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/collections/default_collection/engines/{app_id}/assistants/default_assistant/agents/{agent_id}"
 
-    # Prepare the curl command
-    command = [
-        "curl", "-X", "GET",
-        "-H", f"Authorization: Bearer {access_token}",
-        "-H", "Content-Type: application/json",
-        "-H", f"X-Goog-User-Project: {project_id}",
-        url
-    ]
+    # Make the HTTP request
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+        "X-Goog-User-Project": project_id
+    }
 
-    logging.debug(f"Get Agent Command: {command}")
-    # Execute the command
-    result = subprocess.run(command, capture_output=True, text=True)
-
-    _check_required_params(locals(), ["project_id", "app_id", "agent_id"])
-    if result.returncode == 0:
-        try:
-            agent_data = json.loads(result.stdout)
-            logging.debug(f"Get Agent Response: {agent_data}")
-            return {"agent_details": agent_data}
-        except json.JSONDecodeError:
-            return {"error": "Could not decode JSON response.", "stderr": result.stderr}
-    else:
-        return {"error": f"Error: {result.returncode} - {result.stderr}"}
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return {"agent_details": response.json()}
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Get Agent Error: {str(e)}")
+        return {"error": f"Request failed: {str(e)}", "status_code": response.status_code if 'response' in locals() else None}
 
 def update_agent(project_id, app_id, agent_id, display_name, description, tool_description, adk_deployment_id, auth_id, icon_uri=None):
     """
@@ -264,29 +231,20 @@ def update_agent(project_id, app_id, agent_id, display_name, description, tool_d
         logging.error(f"Authentication error: {str(e)}")
         return {"error": f"Authentication failed: {str(e)}"}
 
-    # Prepare the curl command
-    logging.debug(f"Updated Data: {json.dumps(updated_data, indent=2)}")
-    command = [
-        "curl", "-X", "PATCH",
-        "-H", f"Authorization: Bearer {access_token}",
-        "-H", "Content-Type: application/json",
-        "-H", f"X-Goog-User-Project: {project_id}",
-        url,
-        "-d", json.dumps(updated_data, indent=2)
-    ]
+    # Make the HTTP request
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+        "X-Goog-User-Project": project_id
+    }
 
-    # Execute the command
-    result = subprocess.run(command, capture_output=True, text=True)
-
-    # Return results as JSON
-    response = {"status_code": result.returncode, "stdout": result.stdout, "stderr": result.stderr}
-    if result.returncode == 0:
-        try:
-            updated_agent = json.loads(result.stdout)
-            response["updated_agent"] = updated_agent
-        except json.JSONDecodeError:
-            response["error"] = "Could not decode JSON response for updated agent."
-    return response
+    try:
+        response = requests.patch(url, headers=headers, json=updated_data)
+        response.raise_for_status()
+        return {"status_code": response.status_code, "updated_agent": response.json()}
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Update Agent Error: {str(e)}")
+        return {"error": f"Request failed: {str(e)}", "status_code": response.status_code if 'response' in locals() else None}
 
 def get_agent_by_display_name(project_id, app_id, display_name):
     """
@@ -339,23 +297,17 @@ def delete_agent(project_id, app_id, agent_id):
     # Construct the URL
     url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/collections/default_collection/engines/{app_id}/assistants/default_assistant/agents/{agent_id}"
 
-    # Prepare the curl command
-    command = [
-        "curl", "-X", "DELETE",
-        "-H", f"Authorization: Bearer {access_token}",
-        "-H", "Content-Type: application/json",
-        "-H", f"X-Goog-User-Project: {project_id}",
-        url
-    ]
+    # Make the HTTP request
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+        "X-Goog-User-Project": project_id
+    }
 
-    logging.info(f"Delete Agent Command: {command}")
-
-    # Execute the command
-    result = subprocess.run(command, capture_output=True, text=True)
-
-    if result.returncode == 0:
-        logging.info(f"Agent {agent_id} deleted successfully.")
-        return {"status_code": result.returncode, "stdout": result.stdout, "stderr": result.stderr, "message": f"Agent {agent_id} deleted successfully."}
-    else:
-        logging.error(f"Error deleting agent {agent_id}: {result.returncode}, {result.stderr}")
-        return {"status_code": result.returncode, "stdout": result.stdout, "stderr": result.stderr, "error": f"Error deleting agent: {result.stderr}"}
+    try:
+        response = requests.delete(url, headers=headers)
+        response.raise_for_status()
+        return {"status_code": response.status_code, "message": f"Agent {agent_id} deleted successfully."}
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Delete Agent Error: {str(e)}")
+        return {"error": f"Request failed: {str(e)}", "status_code": response.status_code if 'response' in locals() else None}
