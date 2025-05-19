@@ -145,4 +145,7 @@ def as_agents_list_reasoning_engines():
     return jsonify(engines_list)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Get port from environment variable (Cloud Run sets this)
+    port = int(os.getenv('PORT', 8080))
+    # Run the app
+    app.run(host='0.0.0.0', port=port)
