@@ -1,6 +1,24 @@
 import subprocess
 import json
 import logging
+from google.auth import default
+from google.auth.transport.requests import Request
+
+def get_credentials():
+    """
+    Get Google Cloud credentials using Application Default Credentials.
+    
+    Returns:
+        tuple: (credentials, project_id)
+    """
+    try:
+        credentials, project = default()
+        if credentials.expired:
+            credentials.refresh(Request())
+        return credentials, project
+    except Exception as e:
+        logging.error(f"Error getting credentials: {str(e)}")
+        raise
 
 def _check_required_params(params, required):
     missing = [param for param in required if not params.get(param)]
@@ -24,10 +42,14 @@ def create_agent(project_id, app_id, display_name, description, tool_description
     Returns:
         dict: A dictionary containing the status code, stdout, and stderr of the curl command.
     """
-  
-    
     _check_required_params(locals(), ["project_id", "app_id", "display_name", "description", "tool_description", "adk_deployment_id"])
-    access_token = subprocess.run(["gcloud", "auth", "print-access-token"], capture_output=True, text=True).stdout.strip()
+    
+    try:
+        credentials, _ = get_credentials()
+        access_token = credentials.token
+    except Exception as e:
+        logging.error(f"Authentication error: {str(e)}")
+        return {"error": f"Authentication failed: {str(e)}"}
 
     # Construct the URL
     url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/collections/default_collection/engines/{app_id}/assistants/default_assistant/agents"
@@ -45,7 +67,6 @@ def create_agent(project_id, app_id, display_name, description, tool_description
             },
             "authorizations": [f"projects/{project_id}/locations/global/authorizations/{auth_id}"] if auth_id else [],
         }
-
     }
 
     if icon_uri:
@@ -78,7 +99,6 @@ def create_agent(project_id, app_id, display_name, description, tool_description
 
     return {"status_code": result.returncode, "stdout": result.stdout, "stderr": result.stderr}
 
-
 def list_agents(project_id, app_id):
     """
     Lists agents in the Agent Registry for a given project and app.
@@ -90,7 +110,12 @@ def list_agents(project_id, app_id):
     Returns:
         dict: A dictionary containing a list of agents or an error message.
     """
-    access_token = subprocess.run(["gcloud", "auth", "print-access-token"], capture_output=True, text=True).stdout.strip()
+    try:
+        credentials, _ = get_credentials()
+        access_token = credentials.token
+    except Exception as e:
+        logging.error(f"Authentication error: {str(e)}")
+        return {"error": f"Authentication failed: {str(e)}"}
 
     # Construct the URL
     url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/collections/default_collection/engines/{app_id}/assistants/default_assistant/agents"
@@ -135,7 +160,12 @@ def get_agent(project_id, app_id, agent_id):
     Returns:
         dict: A dictionary containing the agent details or an error message.
     """
-    access_token = subprocess.run(["gcloud", "auth", "print-access-token"], capture_output=True, text=True).stdout.strip()
+    try:
+        credentials, _ = get_credentials()
+        access_token = credentials.token
+    except Exception as e:
+        logging.error(f"Authentication error: {str(e)}")
+        return {"error": f"Authentication failed: {str(e)}"}
 
     # Construct the URL
     url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/collections/default_collection/engines/{app_id}/assistants/default_assistant/agents/{agent_id}"
@@ -163,7 +193,6 @@ def get_agent(project_id, app_id, agent_id):
             return {"error": "Could not decode JSON response.", "stderr": result.stderr}
     else:
         return {"error": f"Error: {result.returncode} - {result.stderr}"}
-
 
 def update_agent(project_id, app_id, agent_id, display_name, description, tool_description, adk_deployment_id, auth_id, icon_uri=None):
     """
@@ -213,7 +242,6 @@ def update_agent(project_id, app_id, agent_id, display_name, description, tool_d
         "reasoning_engine": adk_deployment_id or existing_reasoning
     }
 
-
     #Authorizations
     existing_auths = existing_adk.get("authorizations", [])
     updated_adk["authorizations"] = [auth_id] if auth_id else existing_auths
@@ -229,8 +257,12 @@ def update_agent(project_id, app_id, agent_id, display_name, description, tool_d
     # Construct the URL
     url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/collections/default_collection/engines/{app_id}/assistants/default_assistant/agents/{agent_id}"    
 
-    # Get access token
-    access_token = subprocess.run(["gcloud", "auth", "print-access-token"], capture_output=True, text=True).stdout.strip()
+    try:
+        credentials, _ = get_credentials()
+        access_token = credentials.token
+    except Exception as e:
+        logging.error(f"Authentication error: {str(e)}")
+        return {"error": f"Authentication failed: {str(e)}"}
 
     # Prepare the curl command
     logging.debug(f"Updated Data: {json.dumps(updated_data, indent=2)}")
@@ -297,7 +329,12 @@ def delete_agent(project_id, app_id, agent_id):
     """
     _check_required_params(locals(), ["project_id", "app_id", "agent_id"])
 
-    access_token = subprocess.run(["gcloud", "auth", "print-access-token"], capture_output=True, text=True).stdout.strip()
+    try:
+        credentials, _ = get_credentials()
+        access_token = credentials.token
+    except Exception as e:
+        logging.error(f"Authentication error: {str(e)}")
+        return {"error": f"Authentication failed: {str(e)}"}
 
     # Construct the URL
     url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/collections/default_collection/engines/{app_id}/assistants/default_assistant/agents/{agent_id}"
@@ -305,9 +342,8 @@ def delete_agent(project_id, app_id, agent_id):
     # Prepare the curl command
     command = [
         "curl", "-X", "DELETE",
-        # Although DELETE often doesn't need this, it's good practice
         "-H", f"Authorization: Bearer {access_token}",
-        "-H", "Content-Type: application/json",  # Although DELETE often doesn't need this, it's good practice
+        "-H", "Content-Type: application/json",
         "-H", f"X-Goog-User-Project: {project_id}",
         url
     ]
