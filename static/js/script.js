@@ -81,26 +81,28 @@ function showAddAgentModal(appId, projectId, appId) {
 }
 
 async function loadReasoningEngines(projectId) {
+    const loadingDiv = document.getElementById('adkLoading');
+    const dropdown = document.getElementById('adkDeploymentId');
     try {
+        // Show loading indicator
+        if (loadingDiv) loadingDiv.style.display = 'inline-block';
+        // Optionally, disable the dropdown while loading
+        if (dropdown) dropdown.disabled = true;
+
         const response = await fetch(`/api/as-agents/list-reasoning-engines?project_id=${projectId}`);
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ error: 'Unknown error occurred' }));
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
-        
+
         const engines = await response.json();
-        const dropdown = document.getElementById('adkDeploymentId');
-        
-        // Clear existing options except the first one
         dropdown.innerHTML = '<option value="">Select ADK Deployment ID</option>';
-        
-        // Check if engines is an array
+
         if (!Array.isArray(engines)) {
             console.error('Expected array but got:', engines);
             throw new Error('Invalid response format: expected array of engines');
         }
-        
-        // Add new options
+
         engines.forEach(engine => {
             const option = document.createElement('option');
             option.value = engine.name;
@@ -109,9 +111,12 @@ async function loadReasoningEngines(projectId) {
         });
     } catch (error) {
         console.error('Error loading reasoning engines:', error);
-        const dropdown = document.getElementById('adkDeploymentId');
         dropdown.innerHTML = '<option value="">Error loading engines</option>';
         alert('Error loading reasoning engines. Please try again.');
+    } finally {
+        // Hide loading indicator and enable dropdown
+        if (loadingDiv) loadingDiv.style.display = 'none';
+        if (dropdown) dropdown.disabled = false;
     }
 }
 
