@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,33 +7,249 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <style>
+        :root[data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --border-color: #dee2e6;
+            --accent-color: #0d6efd;
+            --hover-bg: #e9ecef;
+            --card-bg: #ffffff;
+            --modal-bg: #ffffff;
+            --modal-header-bg: #f8f9fa;
+        }
+
+        :root[data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #404040;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --accent-color: #4dabf7;
+            --hover-bg: #333333;
+            --card-bg: #2d2d2d;
+            --modal-bg: #2d2d2d;
+            --modal-header-bg: #262626;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
         .app-card {
             margin-bottom: 1rem;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+
+        .app-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .card-body {
+            color: var(--text-primary);
+        }
+
+        .card-title {
+            color: var(--text-primary);
+        }
+
         .agent-list {
             margin-top: 1rem;
+            background-color: var(--bg-secondary);
+            border-radius: 0.25rem;
+            padding: 1rem;
         }
+
         .agent-item {
             padding: 1rem;
-            border: 1px solid #dee2e6;
+            border: 1px solid var(--border-color);
             border-radius: 0.25rem;
             margin-bottom: 1rem;
-            background-color: #f8f9fa;
+            background-color: var(--bg-secondary);
+            transition: all 0.2s ease;
         }
+
+        .agent-item:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--accent-color);
+        }
+
         .agent-item h6 {
-            color: #0d6efd;
+            color: var(--accent-color);
             margin-bottom: 0.5rem;
+            font-weight: 600;
         }
+
         .agent-item p {
             margin-bottom: 0.25rem;
+            color: var(--text-primary);
         }
+
         .agent-item .label {
             font-weight: bold;
-            color: #495057;
+            color: var(--text-secondary);
+        }
+
+        .modal-content {
+            background-color: var(--modal-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--modal-header-bg);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            background-color: var(--modal-header-bg);
+        }
+
+        .modal-title {
+            color: var(--text-primary);
+        }
+
+        .form-control, .form-select {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-primary);
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .form-control:read-only {
+            background-color: var(--bg-secondary);
+        }
+
+        .form-label {
+            color: var(--text-secondary);
+        }
+
+        .btn-close {
+            filter: var(--btn-close-filter);
+        }
+
+        .alert {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .alert-danger {
+            background-color: #2d1a1a;
+            border-color: #4d1a1a;
+            color: #ff6b6b;
+        }
+
+        .alert-info {
+            background-color: #1a2d2d;
+            border-color: #1a4d4d;
+            color: var(--accent-color);
+        }
+
+        .table {
+            color: var(--text-primary);
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: var(--bg-secondary);
+        }
+
+        .table-striped tbody tr:nth-of-type(even) {
+            background-color: var(--bg-primary);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--hover-bg);
+        }
+
+        #adkLoading {
+            color: var(--accent-color);
+        }
+
+        .theme-switch {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+
+        .theme-switch-btn {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-switch-btn:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .theme-switch-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .bg-dark {
+            background-color: var(--bg-tertiary) !important;
+        }
+
+        .text-light {
+            color: var(--text-primary) !important;
+        }
+
+        .spinner-border {
+            color: var(--accent-color);
         }
     </style>
 </head>
 <body>
+    <div class="theme-switch">
+        <button class="theme-switch-btn" onclick="toggleTheme()">
+            <i class="bi bi-moon-fill"></i>
+            <span>Toggle Theme</span>
+        </button>
+    </div>
+
     <div class="container mt-4">
         <h1 class="mb-4">Agentspace App Catalog</h1>
         
@@ -111,9 +327,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <p><strong>Project ID:</strong> <span id="showAgentsProjectIdDisplay"></span></p>
-                        <p><strong>App ID:</strong> <span id="showAgentsAppIdDisplay"></span></p>
+                    <div class="mb-3 p-3 bg-dark rounded">
+                        <p class="mb-2"><strong>Project ID:</strong> <span id="showAgentsProjectIdDisplay" class="text-light"></span></p>
+                        <p class="mb-0"><strong>App ID:</strong> <span id="showAgentsAppIdDisplay" class="text-light"></span></p>
                     </div>
                     <div id="agentsList" class="agent-list">
                         <!-- Agents will be listed here -->
@@ -128,5 +344,33 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update button icon
+            const themeBtn = document.querySelector('.theme-switch-btn i');
+            themeBtn.className = newTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+        }
+
+        // Set initial theme from localStorage or default to dark
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            // Set initial button icon
+            const themeBtn = document.querySelector('.theme-switch-btn i');
+            themeBtn.className = savedTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+        });
+
+        // Add these CSS variables to the root
+        document.documentElement.style.setProperty('--accent-color-rgb', '77, 171, 247');
+        document.documentElement.style.setProperty('--btn-close-filter', 'invert(1) grayscale(100%) brightness(200%)');
+    </script>
 </body>
 </html>
