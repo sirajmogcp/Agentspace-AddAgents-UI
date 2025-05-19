@@ -303,6 +303,7 @@
                                     <th>ADK Deployment ID</th>
                                     <th>Description</th>
                                     <th>Tool Description</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -310,6 +311,7 @@
                                     console.log('Processing agent:', agent); // Debug log for each agent
                                     const adkDeploymentId = agent.adkAgentDefinition?.provisionedReasoningEngine?.reasoningEngine || 'Not specified';
                                     const toolDescription = agent.adkAgentDefinition?.toolSettings?.toolDescription || 'No tool description';
+                                    const agentId = agent.name.split('/').pop(); // Extract the last part of the name as agent ID
                                     return `
                                     <tr>
                                         <td>${agent.displayName || 'Unnamed Agent'}</td>
@@ -317,6 +319,11 @@
                                         <td>${adkDeploymentId}</td>
                                         <td>${agent.description || 'No description'}</td>
                                         <td>${toolDescription}</td>
+                                        <td>
+                                            <button class="btn btn-danger btn-sm" onclick="deleteAgent('${agentId}')">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </button>
+                                        </td>
                                     </tr>
                                 `}).join('')}
                             </tbody>
@@ -331,6 +338,34 @@
                     <p>${error.message}</p>
                     <small>Please check the console for more details.</small>
                 </div>`;
+            }
+        }
+
+        async function deleteAgent(agentId) {
+            if (!confirm('Are you sure you want to delete this agent?')) {
+                return;
+            }
+
+            try {
+                const projectId = document.getElementById('showAgentsProjectIdDisplay').textContent;
+                const appId = document.getElementById('showAgentsAppIdDisplay').textContent;
+                
+                const response = await fetch(`/api/test-as/delete-agent?project_id=${projectId}&app_id=${appId}&agent_id=${agentId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('Agent deleted successfully!');
+                    // Refresh the agents list
+                    loadAgents(appId);
+                } else {
+                    throw new Error(result.error || 'Failed to delete agent');
+                }
+            } catch (error) {
+                console.error('Error deleting agent:', error);
+                alert(`Error deleting agent: ${error.message}`);
             }
         }
 
