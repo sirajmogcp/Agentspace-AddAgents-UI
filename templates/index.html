@@ -134,11 +134,30 @@
         async function loadApps() {
             try {
                 const response = await fetch('/api/agentspace-apps');
-                const apps = await response.json();
-                displayApps(apps);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // Check if data is an array
+                if (!Array.isArray(data)) {
+                    console.error('Expected array but got:', data);
+                    throw new Error('Invalid response format: expected array of apps');
+                }
+                
+                displayApps(data);
             } catch (error) {
                 console.error('Error loading apps:', error);
-                alert('Error loading apps. Please try again.');
+                const appsList = document.getElementById('appsList');
+                appsList.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">
+                            <h6>Error loading apps</h6>
+                            <p>${error.message}</p>
+                            <small>Please check the console for more details.</small>
+                        </div>
+                    </div>
+                `;
             }
         }
 
@@ -191,7 +210,8 @@
             try {
                 const response = await fetch(`/api/test-as/list-reasoning-engines?project_id=${projectId}`);
                 if (!response.ok) {
-                    throw new Error('Failed to load reasoning engines');
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error occurred' }));
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
                 
                 const engines = await response.json();
@@ -200,17 +220,23 @@
                 // Clear existing options except the first one
                 dropdown.innerHTML = '<option value="">Select ADK Deployment ID</option>';
                 
+                // Check if engines is an array
+                if (!Array.isArray(engines)) {
+                    console.error('Expected array but got:', engines);
+                    throw new Error('Invalid response format: expected array of engines');
+                }
+                
                 // Add new options
                 engines.forEach(engine => {
-                    // Extract the ID after 'reasoningEngines/' from engine.name
-                    const engineId = engine.name;
                     const option = document.createElement('option');
-                    option.value = engineId;
+                    option.value = engine.name;
                     option.textContent = `${engine.display_name} (${engine.name})`;
                     dropdown.appendChild(option);
                 });
             } catch (error) {
                 console.error('Error loading reasoning engines:', error);
+                const dropdown = document.getElementById('adkDeploymentId');
+                dropdown.innerHTML = '<option value="">Error loading engines</option>';
                 alert('Error loading reasoning engines. Please try again.');
             }
         }
