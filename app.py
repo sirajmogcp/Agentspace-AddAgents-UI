@@ -158,7 +158,7 @@ def find_agent_in_app(agentspace_app, agent_id):  # Changed from find_category_i
     return agent
 
 # --- API Endpoints ---
-@app.route('/api/agentspace-apps', methods=['GET'])
+@app.route('/api/as-agents', methods=['GET'])
 def get_agentspace_apps():
     gcp_project_id, gcp_project_id_error = get_gcp_project_id()
     if gcp_project_id_error:

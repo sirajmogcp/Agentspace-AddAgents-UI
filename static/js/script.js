@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', loadApps);
 
 async function loadApps() {
     try {
-        const response = await fetch('/api/agentspace-apps');
+        const response = await fetch('/api/as-agents');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
