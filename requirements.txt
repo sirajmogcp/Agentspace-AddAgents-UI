@@ -3,3 +3,5 @@ requests
 google-auth
 google-cloud-discoveryengine
 google-cloud-aiplatform
+gunicorn
+python-dotenv
