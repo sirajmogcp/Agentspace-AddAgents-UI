@@ -267,7 +267,7 @@ document.getElementById('saveAgentBtn').addEventListener('click', async () => {
     };
 
     try {
-        const response = await fetch('/api/as-agents/create-agent', {
+        const response = await fetch('/api/as-agents/add-agent', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

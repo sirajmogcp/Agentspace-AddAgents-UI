@@ -1,14 +1,7 @@
 import os
-import requests
-import google.auth
-from google.cloud import discoveryengine_v1 as discoveryengine
-from google.api_core.client_options import ClientOptions
-from google.api_core import exceptions as google_api_exceptions
 from flask import Flask, jsonify, request, render_template, abort
-import vertexai
-from vertexai.preview import reasoning_engines
-from as_agent_registry_service import *
 from util import *
+
 app = Flask(__name__)
 
 # --- API Endpoints ---
@@ -51,8 +44,8 @@ def as_agents_list_agents():
     result = list_agents(project_id, app_id)
     return jsonify(result)
 
-@app.route('/api/as-agents/create-agent', methods=['POST'])
-def as_agents_create_agent():
+@app.route('/api/as-agents/add-agent', methods=['POST'])
+def as_agents_add_agent():
     data = request.json
     required_fields = ['project_id', 'app_id', 'display_name', 'description', 'tool_description', 'adk_deployment_id']
     
@@ -60,7 +53,7 @@ def as_agents_create_agent():
         if field not in data:
             return jsonify({"error": f"Missing required field: {field}"}), 400
     
-    result = create_agent(
+    result = add_agent(
         project_id=data['project_id'],
         app_id=data['app_id'],
         display_name=data['display_name'],

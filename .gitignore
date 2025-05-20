@@ -1,6 +1,7 @@
-# Environment variables
+# Environment files
 .env
-.env.*
+env.yaml
+*.env
 
 # Python
 __pycache__/
@@ -8,6 +9,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -27,7 +29,6 @@ wheels/
 # Virtual Environment
 venv/
 ENV/
-env/
 
 # IDE
 .idea/
