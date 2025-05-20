@@ -1,8 +1,15 @@
+
 # AgentSpace Add Agents UI
+
+<img width="1411" alt="image" src="https://github.com/user-attachments/assets/8aaa10a1-d5d6-4dee-ae21-ea6e0f7b4c5e" />
+
+<img width="1485" alt="image" src="https://github.com/user-attachments/assets/9f522ed3-ecf8-451d-94c7-4ce81c896884" />
+
 
 A Flask application for managing AgentSpace agents, built with Google Cloud Discovery Engine and Vertex AI.
 
 ## Prerequisites
+![Uploading image.png…]()
 
 - Python 3.8 or higher
 - Google Cloud SDK
